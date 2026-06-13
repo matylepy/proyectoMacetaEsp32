@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel IoT Vercel</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .card { background: white; max-width: 450px; margin: 40px auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #003366; font-size: 24px; margin-bottom: 5px; }
+        h2 { color: #555; font-size: 16px; font-weight: normal; margin-top: 0; }
+        .status { font-size: 18px; font-weight: bold; padding: 10px; border-radius: 6px; margin: 20px 0; display: inline-block; }
+        .online { background-color: #d4edda; color: #155724; }
+        .offline { background-color: #f8d7da; color: #721c24; }
+        p { color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Universidad Nacional de Avellaneda</h1>
+        <h2>Monitoreo Remoto ESP32</h2>
+        
+        <div id="statusBox" class="status offline">Cargando estado...</div>
+        
+        <p>Última señal recibida: <br><span id="timeBox">-</span></p>
+    </div>
+
+    <script>
+        async function actualizarDatos() {
+            try {
+                // Llama de forma relativa a nuestra API en Vercel
+                const respuesta = await fetch('/api/datos');
+                const datos = await respuesta.json();
+                
+                const statusBox = document.getElementById('statusBox');
+                statusBox.innerText = datos.estadoESP32;
+                
+                if(datos.estadoESP32 === "¡ESP32 En Línea!") {
+                    statusBox.className = "status online";
+                } else {
+                    statusBox.className = "status offline";
+                }
+                
+                document.getElementById('timeBox').innerText = datos.ultimaActualizacion;
+            } catch (error) {
+                console.error("Error al obtener datos:", error);
+            }
+        }
+
+        // Actualiza la web automáticamente cada 3 segundos
+        setInterval(actualizarDatos, 3000);
+        actualizarDatos();
+    </script>
+</body>
+</html>
